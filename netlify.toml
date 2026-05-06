@@ -1,0 +1,19 @@
+# Netlify configuration for TipLab
+# Static export — no server required, works on any CDN
+
+[build]
+  # The Next.js app lives in the tiplab/ subdirectory
+  base    = "tiplab"
+  command = "npm run build"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # Ensures Sydney timezone formatting is consistent across build environments
+  TZ = "Australia/Sydney"
+
+# SPA-style routing: serve index.html for all routes (Next.js static export)
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200

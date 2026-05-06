@@ -62,22 +62,46 @@ const AFL_VENUES = [
   'GMHBA Stadium, Geelong',
 ];
 
+// Fixed kickoff times for Round 14, 2026 (AEST = UTC+10)
+// Using absolute ISO strings so server build and client hydration always agree.
+const NRL_KICKOFFS = [
+  '2026-06-05T19:50:00+10:00',
+  '2026-06-06T17:30:00+10:00',
+  '2026-06-06T19:35:00+10:00',
+  '2026-06-07T14:00:00+10:00',
+  '2026-06-07T16:00:00+10:00',
+  '2026-06-07T18:05:00+10:00',
+  '2026-06-08T14:00:00+10:00',
+  '2026-06-08T16:00:00+10:00',
+];
+
+const AFL_KICKOFFS = [
+  '2026-06-05T19:30:00+10:00',
+  '2026-06-06T13:45:00+10:00',
+  '2026-06-06T16:35:00+10:00',
+  '2026-06-06T19:40:00+10:00',
+  '2026-06-07T14:10:00+10:00',
+  '2026-06-07T16:20:00+10:00',
+  '2026-06-07T19:35:00+10:00',
+  '2026-06-08T13:10:00+10:00',
+];
+
 function makeFixtures(teams: Team[], venues: string[], sport: 'NRL' | 'AFL'): Fixture[] {
+  const kickoffs = sport === 'NRL' ? NRL_KICKOFFS : AFL_KICKOFFS;
   const pairs: [Team, Team][] = [];
   const shuffled = [...teams];
   for (let i = 0; i < Math.min(8, Math.floor(teams.length / 2)); i++) {
     pairs.push([shuffled[i * 2], shuffled[i * 2 + 1]]);
   }
-  const base = Date.now() + 2 * 3600 * 1000;
   return pairs.map(([home, away], i) => ({
     id: `${sport.toLowerCase()}-r14-${i}`,
     sport,
     round: 14,
-    season: 2025,
+    season: 2026,
     home,
     away,
     venue: venues[i % venues.length],
-    kickoff: new Date(base + i * 6 * 3600 * 1000),
+    kickoff: new Date(kickoffs[i]),
     status: 'upcoming' as const,
     commentary: buildCommentary(`${sport.toLowerCase()}-r14-${i}`, home, away, i),
   }));

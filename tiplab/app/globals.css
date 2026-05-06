@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0a0a0a;
+  --color-surface: #141414;
+  --color-card: #1a1a1a;
+  --color-card-hover: #202020;
+  --color-border: #2a2a2a;
+  --color-border-light: #333333;
+  --color-green: #22c55e;
+  --color-green-dim: #16a34a;
+  --color-muted: #6b7280;
+  --color-muted-light: #9ca3af;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  --radius-card: 10px;
+  --radius-card-lg: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: #f1f1f1;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+/* Green glow utility */
+.green-glow {
+  box-shadow: 0 0 24px rgba(34, 197, 94, 0.18);
+}
+
+/* Confidence bar animation */
+.confidence-fill {
+  transition: width 0.7s ease;
+}
+
+/* Commentary panel */
+.commentary-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.commentary-panel.open {
+  max-height: 1000px;
+}
+
+/* Pulse animation for live indicators */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.4); }
+}
+.pulse-dot {
+  animation: pulse-dot 2s infinite;
+}
+
+/* Badge pulse for live */
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.badge-live-pulse {
+  animation: badge-pulse 1.5s infinite;
+}
+
+/* Shimmer skeleton */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+/* Card accent tops */
+.card-accent-nrl {
+  border-top: 2px solid #3b82f6;
+}
+.card-accent-afl {
+  border-top: 2px solid #fb923c;
+}
+
+/* Green tint on selected tips */
+.tip-selected {
+  border-color: #22c55e !important;
+  background: rgba(34, 197, 94, 0.08) !important;
+}
+.tip-dimmed {
+  opacity: 0.4;
+}
+
+/* Form result dots */
+.form-w { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+.form-l { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.form-d { background: rgba(107, 114, 128, 0.2); color: #6b7280; }
+
+/* Mobile safe area padding */
+@media (max-width: 768px) {
+  body { padding-bottom: 68px; }
+}

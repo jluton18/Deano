@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TipLab — NRL & AFL Tipping</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:#0a0a0a;color:#f1f1f1;min-height:100vh;overflow-x:hidden}
+button{cursor:pointer;border:none;background:none;font-family:inherit}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+
+/* ===== CUSTOM PROPERTIES ===== */
+:root{
+  --bg:       #0a0a0a;
+  --surface:  #141414;
+  --card:     #1a1a1a;
+  --card-hover:#202020;
+  --border:   #2a2a2a;
+  --border-light:#333;
+  --green:    #22c55e;
+  --green-dim:#16a34a;
+  --green-glow:rgba(34,197,94,.15);
+  --text:     #f1f1f1;
+  --muted:    #6b7280;
+  --muted-light:#9ca3af;
+  --white:    #ffffff;
+  --radius:   10px;
+  --radius-lg:14px;
+  --shadow:   0 4px 24px rgba(0,0,0,.6);
+  --transition:.2s ease;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+
+/* ===== TYPOGRAPHY ===== */
+h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;line-height:1.15;letter-spacing:-.03em}
+h2{font-size:clamp(1.1rem,2.5vw,1.4rem);font-weight:700;letter-spacing:-.02em}
+h3{font-size:1rem;font-weight:600}
+p{line-height:1.6;color:var(--muted-light)}
+
+/* ===== LAYOUT ===== */
+.container{max-width:1200px;margin:0 auto;padding:0 16px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.flex{display:flex}
+.flex-col{flex-direction:column}
+.items-center{align-items:center}
+.items-start{align-items:flex-start}
+.justify-between{justify-content:space-between}
+.gap-2{gap:8px}
+.gap-3{gap:12px}
+.gap-4{gap:16px}
+
+/* ===== BADGE ===== */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:.7rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.badge-green{background:var(--green-glow);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.badge-nrl{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.2)}
+.badge-afl{background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.2)}
+.badge-live{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25);animation:pulse-badge 1.5s infinite}
+@keyframes pulse-badge{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* ===== BUTTONS ===== */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;font-size:.875rem;font-weight:600;transition:all var(--transition)}
+.btn-primary{background:var(--green);color:#000;box-shadow:0 0 20px var(--green-glow)}
+.btn-primary:hover{background:#16a34a;box-shadow:0 0 30px rgba(34,197,94,.3);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted-light);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--green);color:var(--green)}
+.btn-sm{padding:7px 14px;font-size:.8rem}
+
+/* ===== NAVBAR ===== */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,10,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 16px;max-width:1200px;margin:0 auto}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;letter-spacing:-.02em}
+.nav-logo .logo-icon{width:34px;height:34px}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-link{padding:7px 14px;border-radius:7px;font-size:.875rem;font-weight:500;color:var(--muted-light);transition:all var(--transition)}
+.nav-link:hover,.nav-link.active{color:var(--white);background:var(--card)}
+.nav-link.active{color:var(--green)}
+.nav-cta{display:flex;align-items:center;gap:8px}
+.hamburger{display:none;flex-direction:column;gap:5px;padding:8px;border-radius:6px;background:var(--card)}
+.hamburger span{width:20px;height:2px;background:var(--text);border-radius:2px;transition:all var(--transition)}
+.mobile-menu{display:none;position:fixed;top:60px;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);z-index:99;padding:12px 16px;flex-direction:column;gap:4px}
+.mobile-menu.open{display:flex}
+.mobile-nav-link{padding:12px 14px;border-radius:8px;font-size:.9rem;font-weight:500;color:var(--muted-light);transition:all var(--transition)}
+.mobile-nav-link:hover,.mobile-nav-link.active{color:var(--green);background:var(--green-glow)}
+
+@media(max-width:768px){
+  .nav-links,.nav-cta .btn:first-child{display:none}
+  .hamburger{display:flex}
+}
+@media(min-width:769px){.hamburger{display:none}}
+
+/* ===== HERO ===== */
+#hero{padding:100px 0 48px;background:linear-gradient(180deg,rgba(34,197,94,.04) 0%,transparent 60%)}
+.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:var(--green-glow);border:1px solid rgba(34,197,94,.3);border-radius:20px;padding:5px 12px;font-size:.75rem;font-weight:600;color:var(--green);margin-bottom:20px;letter-spacing:.06em;text-transform:uppercase}
+.hero-tag-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.7}}
+.hero h1 span{color:var(--green)}
+.hero-sub{margin:16px 0 32px;font-size:1rem;color:var(--muted-light);max-width:420px;line-height:1.7}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.hero-stat{text-align:center}
+.hero-stat .num{font-size:1.6rem;font-weight:800;color:var(--white)}
+.hero-stat .lbl{font-size:.75rem;color:var(--muted);margin-top:2px}
+.hero-card-wrap{position:relative}
+.hero-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;position:relative;overflow:hidden}
+.hero-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),#16a34a)}
+.hero-card-label{font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.kickoff-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(34,197,94,.15);border-radius:4px;padding:2px 8px;font-size:.75rem;font-weight:700;color:var(--green);margin-bottom:16px}
+
+@media(max-width:768px){
+  #hero{padding:76px 0 36px}
+  .hero-inner{grid-template-columns:1fr}
+  .hero-card-wrap{order:-1;margin-bottom:8px}
+  .hero-stats{grid-template-columns:repeat(3,1fr);gap:8px}
+}
+
+/* ===== SECTION ===== */
+.section{padding:48px 0}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.section-title{font-size:1.15rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';width:3px;height:18px;background:var(--green);border-radius:2px}
+
+/* ===== TABS ===== */
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:24px}
+.tab{flex:1;padding:9px 16px;border-radius:7px;font-size:.85rem;font-weight:600;color:var(--muted);transition:all var(--transition);text-align:center}
+.tab.active{background:var(--card);color:var(--white);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.tab.nrl.active{color:#60a5fa}
+.tab.afl.active{color:#fb923c}
+.tabs-wide{max-width:300px}
+
+/* ===== MATCH CARD ===== */
+.match-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all var(--transition);position:relative}
+.match-card:hover{border-color:var(--border-light);transform:translateY(-2px);box-shadow:var(--shadow)}
+.match-card-top{padding:14px 16px 0;display:flex;align-items:center;justify-content:space-between}
+.match-meta{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--muted)}
+.match-teams{padding:16px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.team-col{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.team-col.away{flex-direction:column-reverse}
+.team-logo{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0}
+.team-name{font-size:.8rem;font-weight:600;color:var(--text)}
+.vs-block{display:flex;flex-direction:column;align-items:center;gap:4px}
+.vs-text{font-size:.7rem;font-weight:700;color:var(--muted);letter-spacing:.08em}
+.countdown{font-size:.8rem;font-weight:700;color:var(--green);white-space:nowrap}
+.match-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kickoff-time{font-size:.78rem;color:var(--muted-light)}
+.kickoff-time strong{color:var(--text);font-weight:600}
+.tip-btn{padding:6px 14px;border-radius:6px;font-size:.78rem;font-weight:600;border:1px solid var(--border);color:var(--muted-light);transition:all var(--transition)}
+.tip-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-glow)}
+.tip-btn.tipped{background:var(--green);color:#000;border-color:var(--green)}
+.commentary-toggle{width:100%;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:.78rem;font-weight:500;color:var(--muted);border-top:1px solid var(--border);transition:all var(--transition)}
+.commentary-toggle:hover{color:var(--green);background:var(--green-glow)}
+.toggle-icon{transition:transform .3s ease;font-size:.9rem}
+.toggle-icon.open{transform:rotate(180deg)}
+
+/* ===== COMMENTARY PANEL ===== */
+.commentary-panel{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.commentary-panel.open{max-height:900px}
+.commentary-inner{padding:16px;border-top:1px solid var(--border)}
+.commentary-headline{font-size:1rem;font-weight:700;margin-bottom:8px;line-height:1.4;color:var(--white)}
+.commentary-summary{font-size:.82rem;color:var(--muted-light);margin-bottom:16px;line-height:1.7}
+.commentary-section{margin-bottom:14px}
+.commentary-section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--green);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.commentary-section-title::before{content:'';width:10px;height:2px;background:var(--green);border-radius:2px}
+.commentary-section-body{font-size:.82rem;color:var(--muted-light);line-height:1.65}
+.key-players{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.player-chip{padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:.75rem;font-weight:500;color:var(--text)}
+.confidence-bar-wrap{display:flex;align-items:center;gap:10px;margin-top:8px}
+.confidence-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.confidence-bar-fill{height:100%;background:linear-gradient(90deg,var(--green-dim),var(--green));border-radius:3px;transition:width .6s ease}
+.confidence-label{font-size:.75rem;font-weight:600;color:var(--green);white-space:nowrap}
+.watch-list{list-style:none;display:flex;flex-direction:column;gap:5px;margin-top:6px}
+.watch-list li{font-size:.82rem;color:var(--muted-light);display:flex;align-items:flex-start;gap:6px}
+.watch-list li::before{content:'→';color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px}
+.prediction-box{margin-top:14px;padding:12px;background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.2);border-radius:8px}
+.prediction-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--green);margin-bottom:4px}
+.prediction-text{font-size:.85rem;font-weight:600;color:var(--white)}
+
+/* ===== TIPPING PANEL ===== */
+#tipping{padding:48px 0}
+.tipping-grid{display:flex;flex-direction:column;gap:2px}
+.tip-row{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all var(--transition)}
+.tip-row:hover{border-color:var(--border-light)}
+.tip-row-inner{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding:14px 16px}
+.tip-team-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 12px;border-radius:8px;transition:all var(--transition);border:2px solid transparent;flex:1}
+.tip-team-btn:hover{background:var(--surface);border-color:var(--border-light)}
+.tip-team-btn.selected{border-color:var(--green);background:var(--green-glow)}
+.tip-team-btn.selected .tip-team-name{color:var(--green)}
+.tip-team-btn.opponent-selected{opacity:.45}
+.tip-team-name{font-size:.82rem;font-weight:600;color:var(--text);transition:color var(--transition)}
+.tip-vs{font-size:.7rem;font-weight:700;color:var(--muted);letter-spacing:.06em;text-align:center}
+.tip-row-meta{padding:8px 16px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
+.tip-row-info{font-size:.75rem;color:var(--muted)}
+.tip-saved{font-size:.75rem;font-weight:600;color:var(--green);display:flex;align-items:center;gap:4px;opacity:0;transition:opacity .3s}
+.tip-saved.show{opacity:1}
+.tipping-summary{margin-top:24px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tipping-progress{display:flex;align-items:center;gap:12px}
+.tipping-count{font-size:1.6rem;font-weight:800;color:var(--green)}
+.tipping-count-label{font-size:.8rem;color:var(--muted-light)}
+.progress-dots{display:flex;gap:4px;flex-wrap:wrap;max-width:200px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);transition:background .3s}
+.dot.filled{background:var(--green)}
+
+/* ===== LEADERBOARD ===== */
+.leaderboard-tabs{display:flex;gap:4px;margin-bottom:16px}
+.lb-tab{padding:7px 16px;border-radius:7px;font-size:.82rem;font-weight:600;color:var(--muted);background:var(--surface);border:1px solid var(--border);transition:all var(--transition)}
+.lb-tab.active{background:var(--card);color:var(--green);border-color:rgba(34,197,94,.3)}
+.leaderboard-table{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.lb-header{display:grid;grid-template-columns:40px 1fr 60px 60px 70px;gap:8px;padding:11px 16px;background:var(--surface);border-bottom:1px solid var(--border);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.lb-row{display:grid;grid-template-columns:40px 1fr 60px 60px 70px;gap:8px;padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;transition:background var(--transition)}
+.lb-row:last-child{border-bottom:none}
+.lb-row:hover{background:rgba(255,255,255,.02)}
+.lb-row.top-3{background:rgba(34,197,94,.03)}
+.lb-rank{font-size:.85rem;font-weight:700;color:var(--muted);text-align:center}
+.lb-rank.gold{color:#fbbf24}
+.lb-rank.silver{color:#94a3b8}
+.lb-rank.bronze{color:#b45309}
+.lb-user{display:flex;align-items:center;gap:10px}
+.lb-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
+.lb-username{font-size:.875rem;font-weight:600;color:var(--text)}
+.lb-sub{font-size:.7rem;color:var(--muted)}
+.lb-score{font-size:.9rem;font-weight:700;color:var(--white);text-align:center}
+.lb-pts{font-size:.85rem;font-weight:600;color:var(--muted-light);text-align:center}
+.lb-acc{font-size:.8rem;font-weight:600;text-align:center}
+.lb-movement{display:flex;align-items:center;gap:2px;font-size:.75rem;font-weight:600}
+.mv-up{color:var(--green)}
+.mv-dn{color:#f87171}
+.mv-eq{color:var(--muted)}
+
+/* ===== NEXT KICKOFF CARD ===== */
+.next-kickoff-card{background:var(--card);border:1px solid rgba(34,197,94,.25);border-radius:var(--radius-lg);padding:20px;position:relative;overflow:hidden;margin-bottom:24px}
+.next-kickoff-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(34,197,94,.06),transparent 60%);pointer-events:none}
+.nk-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.nk-label::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse-dot 2s infinite}
+.nk-teams{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.nk-team{display:flex;align-items:center;gap:8px}
+.nk-team-name{font-size:1rem;font-weight:700;color:var(--white)}
+.nk-vs{font-size:.85rem;font-weight:700;color:var(--muted);padding:0 4px}
+.nk-countdown{font-size:1.8rem;font-weight:800;color:var(--green);letter-spacing:-.02em;margin-bottom:8px;font-variant-numeric:tabular-nums}
+.nk-meta{font-size:.78rem;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap}
+.nk-meta span{display:flex;align-items:center;gap:4px}
+
+/* ===== FORM INDICATORS ===== */
+.form-strip{display:flex;gap:3px;margin-top:4px}
+.form-dot{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:700}
+.form-w{background:rgba(34,197,94,.2);color:var(--green)}
+.form-l{background:rgba(239,68,68,.15);color:#f87171}
+.form-d{background:rgba(107,114,128,.2);color:var(--muted)}
+
+/* ===== FOOTER ===== */
+footer{border-top:1px solid var(--border);padding:32px 0;margin-top:48px}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.footer-copy{font-size:.8rem;color:var(--muted)}
+.footer-links{display:flex;gap:16px}
+.footer-links a{font-size:.8rem;color:var(--muted);transition:color var(--transition)}
+.footer-links a:hover{color:var(--green)}
+
+/* ===== MOBILE BOTTOM NAV ===== */
+#mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:100;padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+.mobile-nav-items{display:grid;grid-template-columns:repeat(5,1fr)}
+.mnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;font-size:.6rem;font-weight:600;color:var(--muted);transition:color var(--transition)}
+.mnav-item.active{color:var(--green)}
+.mnav-icon{font-size:1.15rem;line-height:1}
+@media(max-width:768px){
+  #mobile-nav{display:block}
+  body{padding-bottom:70px}
+}
+
+/* ===== TOAST ===== */
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#000;padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:200;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(min-width:769px){#toast{bottom:30px}}
+
+/* ===== LOADING SKELETON ===== */
+.skeleton{background:linear-gradient(90deg,var(--border) 25%,var(--card) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ===== PAGE SECTIONS ===== */
+.page-section{display:none}
+.page-section.active{display:block}
+
+/* ===== FEATURE STRIP ===== */
+.feature-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:32px 0}
+.feature-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:all var(--transition)}
+.feature-card:hover{border-color:rgba(34,197,94,.3);transform:translateY(-2px)}
+.feature-icon{font-size:1.5rem;margin-bottom:8px}
+.feature-title{font-size:.875rem;font-weight:600;margin-bottom:4px}
+.feature-desc{font-size:.78rem;color:var(--muted)}
+
+/* ===== TRENDS ===== */
+.trend-list{display:flex;flex-direction:column;gap:2px}
+.trend-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;transition:all var(--transition)}
+.trend-item:hover{border-color:var(--border-light);transform:translateX(2px)}
+.trend-num{font-size:.75rem;font-weight:700;color:var(--muted);width:20px;text-align:center}
+.trend-body{flex:1}
+.trend-title{font-size:.875rem;font-weight:600;color:var(--text)}
+.trend-meta{font-size:.75rem;color:var(--muted);margin-top:2px}
+.trend-badge{font-size:.7rem;font-weight:600;padding:2px 7px;border-radius:10px}
+
+/* ===== ADMIN ===== */
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.admin-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:all var(--transition)}
+.admin-card:hover{border-color:rgba(34,197,94,.3)}
+.admin-card-icon{font-size:1.4rem;margin-bottom:8px}
+.admin-card-title{font-size:.9rem;font-weight:700;margin-bottom:4px}
+.admin-card-desc{font-size:.78rem;color:var(--muted);margin-bottom:12px}
+.admin-stat{font-size:1.4rem;font-weight:800;color:var(--green);margin-bottom:2px}
+
+/* ===== HELPERS ===== */
+.text-green{color:var(--green)}
+.text-muted{color:var(--muted)}
+.text-sm{font-size:.82rem}
+.text-xs{font-size:.75rem}
+.fw-700{font-weight:700}
+.mt-1{margin-top:4px}
+.mt-2{margin-top:8px}
+.mt-3{margin-top:12px}
+.mt-4{margin-top:16px}
+.mb-4{margin-bottom:16px}
+.divider{height:1px;background:var(--border);margin:24px 0}
+
+/* === MATCH CARD ACCENT LINE === */
+.match-card.nrl-card{border-top:2px solid #3b82f6}
+.match-card.afl-card{border-top:2px solid #fb923c}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" onclick="showSection('home')">
+      <svg class="logo-icon" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="34" height="34" rx="8" fill="#22c55e"/>
+        <path d="M7 10h20M17 10v14" stroke="#000" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M11 18l6 6 6-6" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      TipLab
+    </a>
+    <div class="nav-links">
+      <a class="nav-link active" href="#" onclick="showSection('home');setActive(this)">Home</a>
+      <a class="nav-link" href="#" onclick="showSection('fixtures');setActive(this)">Fixtures</a>
+      <a class="nav-link" href="#" onclick="showSection('tipping');setActive(this)">Tipping</a>
+      <a class="nav-link" href="#" onclick="showSection('leaderboard');setActive(this)">Leaderboard</a>
+      <a class="nav-link" href="#" onclick="showSection('admin');setActive(this)">Admin</a>
+    </div>
+    <div class="nav-cta">
+      <button class="btn btn-ghost btn-sm">Sign In</button>
+      <button class="btn btn-primary btn-sm">Join Free</button>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a class="mobile-nav-link active" href="#" onclick="showSection('home');toggleMenu()">🏠 Home</a>
+  <a class="mobile-nav-link" href="#" onclick="showSection('fixtures');toggleMenu()">📅 Fixtures</a>
+  <a class="mobile-nav-link" href="#" onclick="showSection('tipping');toggleMenu()">✅ Tipping</a>
+  <a class="mobile-nav-link" href="#" onclick="showSection('leaderboard');toggleMenu()">🏆 Leaderboard</a>
+  <a class="mobile-nav-link" href="#" onclick="showSection('admin');toggleMenu()">⚙️ Admin</a>
+  <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px;display:flex;gap:8px">
+    <button class="btn btn-ghost btn-sm" style="flex:1">Sign In</button>
+    <button class="btn btn-primary btn-sm" style="flex:1">Join Free</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ===== MAIN ===== -->
+<main>
+
+<!-- ===================== HOME ===================== -->
+<div id="page-home" class="page-section active">
+
+  <!-- Hero -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero">
+          <div class="hero-tag"><span class="hero-tag-dot"></span>2025 Season — Live</div>
+          <h1>Your <span>premium</span><br>sports tipping<br>hub.</h1>
+          <p class="hero-sub">NRL and AFL previews, match analysis, tipping competitions, and live community leaderboards. All in one polished platform.</p>
+          <div class="hero-btns">
+            <button class="btn btn-primary" onclick="showSection('tipping')">Start Tipping →</button>
+            <button class="btn btn-ghost" onclick="showSection('fixtures')">View Fixtures</button>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="num">2,841</div><div class="lbl">Active Tippers</div></div>
+            <div class="hero-stat"><div class="num">34</div><div class="lbl">Rounds Live</div></div>
+            <div class="hero-stat"><div class="num">68%</div><div class="lbl">Avg Accuracy</div></div>
+          </div>
+        </div>
+        <div class="hero-card-wrap">
+          <div class="hero-card">
+            <div class="hero-card-label">⚡ Next Kickoff</div>
+            <div class="kickoff-badge" id="heroCountdown">Loading…</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="team-logo" style="background:rgba(239,68,68,.15);color:#f87171;width:38px;height:38px;font-size:.75rem">SYD</div>
+                <span style="font-weight:700;font-size:.9rem">Sydney Roosters</span>
+              </div>
+              <span style="color:var(--muted);font-weight:700;font-size:.8rem">vs</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="team-logo" style="background:rgba(34,197,94,.15);color:var(--green);width:38px;height:38px;font-size:.75rem">PEN</div>
+                <span style="font-weight:700;font-size:.9rem">Penrith</span>
+              </div>
+            </div>
+            <div style="font-size:.78rem;color:var(--muted);margin-bottom:14px">📍 Allianz Stadium · Fri 7:50 PM AEST · NRL Rd 14</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-primary btn-sm" style="flex:1" onclick="showToast('Tip saved: Sydney Roosters ✓')">Tip Roosters</button>
+              <button class="btn btn-ghost btn-sm" style="flex:1" onclick="showToast('Tip saved: Penrith Panthers ✓')">Tip Panthers</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="feature-strip">
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <div class="feature-title">Match Previews</div>
+          <div class="feature-desc">Deep analysis on every NRL & AFL game this round</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">✅</div>
+          <div class="feature-title">Tipping Comps</div>
+          <div class="feature-desc">Compete in round and season competitions</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🏆</div>
+          <div class="feature-title">Live Leaderboards</div>
+          <div class="feature-desc">Track rankings, accuracy and streaks in real time</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <div class="feature-title">Mobile First</div>
+          <div class="feature-desc">Optimised tipping experience on any device</div>
+        </div>
+      </div>
+
+      <!-- Trending -->
+      <div class="section-header">
+        <div class="section-title">Trending Discussions</div>
+        <button class="btn btn-ghost btn-sm">See All</button>
+      </div>
+      <div class="trend-list">
+        <div class="trend-item">
+          <div class="trend-num">1</div>
+          <div class="trend-body">
+            <div class="trend-title">Panthers without Cleary — how much does it matter?</div>
+            <div class="trend-meta">NRL · 142 comments · 2h ago</div>
+          </div>
+          <span class="trend-badge badge badge-nrl">NRL</span>
+        </div>
+        <div class="trend-item">
+          <div class="trend-num">2</div>
+          <div class="trend-body">
+            <div class="trend-title">Collingwood looking unstoppable in 2025 — or is it too early?</div>
+            <div class="trend-meta">AFL · 98 comments · 4h ago</div>
+          </div>
+          <span class="trend-badge badge badge-afl">AFL</span>
+        </div>
+        <div class="trend-item">
+          <div class="trend-num">3</div>
+          <div class="trend-body">
+            <div class="trend-title">Broncos vs Storm — who wins the big Saturday night clash?</div>
+            <div class="trend-meta">NRL · 87 comments · 5h ago</div>
+          </div>
+          <span class="trend-badge badge badge-nrl">NRL</span>
+        </div>
+        <div class="trend-item">
+          <div class="trend-num">4</div>
+          <div class="trend-body">
+            <div class="trend-title">Which AFL team has the best trade period winner?</div>
+            <div class="trend-meta">AFL · 65 comments · 8h ago</div>
+          </div>
+          <span class="trend-badge badge badge-afl">AFL</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Featured Matches -->
+      <div class="section-header">
+        <div class="section-title">Featured Matches</div>
+        <button class="btn btn-ghost btn-sm" onclick="showSection('fixtures')">All Fixtures →</button>
+      </div>
+      <div class="grid-2" id="featuredMatches"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ===================== FIXTURES ===================== -->
+<div id="page-fixtures" class="page-section">
+  <div class="container" style="padding-top:80px">
+    <div class="section-header">
+      <h2>Fixtures</h2>
+      <span class="badge badge-green">Round 14</span>
+    </div>
+    <div class="tabs tabs-wide" id="fixtureTabs">
+      <button class="tab nrl active" onclick="switchFixtureTab('nrl',this)">🏉 NRL</button>
+      <button class="tab afl" onclick="switchFixtureTab('afl',this)">🏈 AFL</button>
+    </div>
+    <div id="nrl-fixtures" class="grid-2"></div>
+    <div id="afl-fixtures" class="grid-2" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ===================== TIPPING ===================== -->
+<div id="page-tipping" class="page-section">
+  <div class="container" style="padding-top:80px">
+    <div class="section-header">
+      <h2>Tipping — Round 14</h2>
+      <div class="flex gap-2 items-center">
+        <span class="badge badge-green" id="tipCount">0 / 8 tipped</span>
+      </div>
+    </div>
+    <p class="text-sm text-muted mb-4" style="margin-bottom:16px">Select your winner for each match. Tips lock at kickoff.</p>
+    <div class="tabs tabs-wide" id="tipTabs">
+      <button class="tab nrl active" onclick="switchTipTab('nrl',this)">🏉 NRL</button>
+      <button class="tab afl" onclick="switchTipTab('afl',this)">🏈 AFL</button>
+    </div>
+    <div id="nrl-tipping"></div>
+    <div id="afl-tipping" style="display:none"></div>
+    <div class="tipping-summary" id="tippingSummary">
+      <div class="tipping-progress">
+        <div>
+          <div class="tipping-count" id="tipProgressNum">0</div>
+          <div class="tipping-count-label">of 8 tipped</div>
+        </div>
+        <div class="progress-dots" id="progressDots"></div>
+      </div>
+      <button class="btn btn-primary" onclick="submitAllTips()">Submit Tips →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== LEADERBOARD ===================== -->
+<div id="page-leaderboard" class="page-section">
+  <div class="container" style="padding-top:80px">
+    <div class="section-header">
+      <h2>Leaderboard</h2>
+      <span class="badge badge-green">Round 14</span>
+    </div>
+    <div class="leaderboard-tabs">
+      <button class="lb-tab active" onclick="switchLbTab('round',this)">Round</button>
+      <button class="lb-tab" onclick="switchLbTab('season',this)">Season</button>
+      <button class="lb-tab" onclick="switchLbTab('nrl',this)">NRL</button>
+      <button class="lb-tab" onclick="switchLbTab('afl',this)">AFL</button>
+    </div>
+    <div class="leaderboard-table">
+      <div class="lb-header">
+        <div style="text-align:center">#</div>
+        <div>Tipper</div>
+        <div style="text-align:center">Pts</div>
+        <div style="text-align:center">Total</div>
+        <div style="text-align:center">Acc%</div>
+      </div>
+      <div id="lbBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ADMIN ===================== -->
+<div id="page-admin" class="page-section">
+  <div class="container" style="padding-top:80px">
+    <div class="section-header">
+      <h2>⚙️ Admin Panel</h2>
+      <span class="badge badge-green">TipLab v1.0</span>
+    </div>
+    <div class="admin-grid">
+      <div class="admin-card">
+        <div class="admin-card-icon">📅</div>
+        <div class="admin-stat">16</div>
+        <div class="admin-card-title">Fixtures This Round</div>
+        <div class="admin-card-desc">Manage upcoming NRL & AFL games</div>
+        <button class="btn btn-ghost btn-sm" style="width:100%">Manage Fixtures</button>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-icon">✏️</div>
+        <div class="admin-stat">12</div>
+        <div class="admin-card-title">Commentary Entries</div>
+        <div class="admin-card-desc">Edit match previews and analysis</div>
+        <button class="btn btn-ghost btn-sm" style="width:100%">Edit Commentary</button>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-icon">🏆</div>
+        <div class="admin-stat">2,841</div>
+        <div class="admin-card-title">Registered Users</div>
+        <div class="admin-card-desc">View and manage accounts</div>
+        <button class="btn btn-ghost btn-sm" style="width:100%">Manage Users</button>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-icon">✅</div>
+        <div class="admin-stat">19,204</div>
+        <div class="admin-card-title">Tips Submitted</div>
+        <div class="admin-card-desc">Round 14 tips submitted so far</div>
+        <button class="btn btn-ghost btn-sm" style="width:100%">View Tips</button>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-icon">⚽</div>
+        <div class="admin-stat">34</div>
+        <div class="admin-card-title">Teams Registered</div>
+        <div class="admin-card-desc">NRL + AFL team management</div>
+        <button class="btn btn-ghost btn-sm" style="width:100%">Manage Teams</button>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-icon">🔁</div>
+        <div class="admin-stat">—</div>
+        <div class="admin-card-title">Recalculate Scores</div>
+        <div class="admin-card-desc">Trigger leaderboard recalculation</div>
+        <button class="btn btn-primary btn-sm" style="width:100%" onclick="showToast('Leaderboard recalculated ✓')">Run Now</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-header"><div class="section-title">Recent Results Entry</div></div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+      <div style="padding:14px 16px;background:var(--surface);border-bottom:1px solid var(--border);font-size:.8rem;font-weight:600;color:var(--muted);display:grid;grid-template-columns:1fr 1fr 100px;gap:8px">
+        <div>Match</div><div>Winner</div><div>Action</div>
+      </div>
+      <div id="adminResults"></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- Bottom Mobile Nav -->
+<nav id="mobile-nav">
+  <div class="mobile-nav-items">
+    <button class="mnav-item active" onclick="showSection('home');setMobileActive(this)">
+      <span class="mnav-icon">🏠</span>Home
+    </button>
+    <button class="mnav-item" onclick="showSection('fixtures');setMobileActive(this)">
+      <span class="mnav-icon">📅</span>Fixtures
+    </button>
+    <button class="mnav-item" onclick="showSection('tipping');setMobileActive(this)">
+      <span class="mnav-icon">✅</span>Tipping
+    </button>
+    <button class="mnav-item" onclick="showSection('leaderboard');setMobileActive(this)">
+      <span class="mnav-icon">🏆</span>Board
+    </button>
+    <button class="mnav-item" onclick="showSection('admin');setMobileActive(this)">
+      <span class="mnav-icon">⚙️</span>Admin
+    </button>
+  </div>
+</nav>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="22" height="22" viewBox="0 0 34 34" fill="none"><rect width="34" height="34" rx="8" fill="#22c55e"/><path d="M7 10h20M17 10v14" stroke="#000" stroke-width="3.5" stroke-linecap="round"/><path d="M11 18l6 6 6-6" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="font-weight:700;font-size:.9rem">TipLab</span>
+      </div>
+      <div class="footer-copy">© 2025 TipLab. For entertainment purposes only.</div>
+      <div class="footer-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ===================================================================
+   DATA
+=================================================================== */
+const NRL_TEAMS = [
+  {code:'BRI',name:'Brisbane Broncos',color:'#6b21a8',text:'#c084fc'},
+  {code:'CBR',name:'Canberra Raiders',color:'#166534',text:'#4ade80'},
+  {code:'CBY',name:'Canterbury Bulldogs',color:'#1e3a5f',text:'#60a5fa'},
+  {code:'CRO',name:'Cronulla Sharks',color:'#0c4a6e',text:'#38bdf8'},
+  {code:'GLD',name:'Gold Coast Titans',color:'#78350f',text:'#fbbf24'},
+  {code:'MAN',name:'Manly Sea Eagles',color:'#1e1b4b',text:'#a5b4fc'},
+  {code:'MEL',name:'Melbourne Storm',color:'#4a044e',text:'#d946ef'},
+  {code:'NEW',name:'Newcastle Knights',color:'#1c1917',text:'#a8a29e'},
+  {code:'NZW',name:'New Zealand Warriors',color:'#1e3a5f',text:'#93c5fd'},
+  {code:'NQC',name:'North Queensland Cowboys',color:'#1c2951',text:'#fbbf24'},
+  {code:'PAR',name:'Parramatta Eels',color:'#1e3a5f',text:'#fbbf24'},
+  {code:'PEN',name:'Penrith Panthers',color:'#1a1a2e',text:'#818cf8'},
+  {code:'SSY',name:'South Sydney Rabbitohs',color:'#14532d',text:'#f87171'},
+  {code:'SGI',name:'St George Illawarra',color:'#7f1d1d',text:'#fca5a5'},
+  {code:'SYD',name:'Sydney Roosters',color:'#7f1d1d',text:'#f87171'},
+  {code:'WST',name:'Wests Tigers',color:'#78350f',text:'#fb923c'},
+];
+
+const AFL_TEAMS = [
+  {code:'ADE',name:'Adelaide Crows',color:'#831843',text:'#f9a8d4'},
+  {code:'BRL',name:'Brisbane Lions',color:'#7c2d12',text:'#fdba74'},
+  {code:'CAR',name:'Carlton Blues',color:'#1e3a5f',text:'#93c5fd'},
+  {code:'COL',name:'Collingwood Magpies',color:'#1c1917',text:'#e7e5e4'},
+  {code:'ESS',name:'Essendon Bombers',color:'#450a0a',text:'#f87171'},
+  {code:'FRE',name:'Fremantle Dockers',color:'#4c1d95',text:'#c4b5fd'},
+  {code:'GEE',name:'Geelong Cats',color:'#1e3a5f',text:'#fbbf24'},
+  {code:'GCS',name:'Gold Coast Suns',color:'#7c2d12',text:'#fbbf24'},
+  {code:'GWS',name:'GWS Giants',color:'#7f1d1d',text:'#fb923c'},
+  {code:'HAW',name:'Hawthorn Hawks',color:'#713f12',text:'#fbbf24'},
+  {code:'MEL',name:'Melbourne Demons',color:'#7f1d1d',text:'#f9a8d4'},
+  {code:'NME',name:'North Melbourne',color:'#1e3a5f',text:'#f1f5f9'},
+  {code:'POR',name:'Port Adelaide',color:'#0c4a6e',text:'#38bdf8'},
+  {code:'RIC',name:'Richmond Tigers',color:'#1c1917',text:'#fbbf24'},
+  {code:'STK',name:'St Kilda Saints',color:'#1c1917',text:'#f87171'},
+  {code:'SYD',name:'Sydney Swans',color:'#7f1d1d',text:'#f9a8d4'},
+  {code:'WCE',name:'West Coast Eagles',color:'#1e3a5f',text:'#fbbf24'},
+  {code:'WBD',name:'Western Bulldogs',color:'#1e3a5f',text:'#f87171'},
+];
+
+const VENUES_NRL = ['Accor Stadium','Allianz Stadium','AAMI Park','CommBank Stadium','4 Pines Park','McDonald Jones Stadium'];
+const VENUES_AFL = ['MCG','Marvel Stadium','Adelaide Oval','Optus Stadium','Gabba','SCG','ENGIE Stadium'];
+
+// Build fixtures
+function makeFixtures(teams, venues, sport) {
+  const shuffled = [...teams].sort(()=>Math.random()-.5);
+  const fixtures = [];
+  const baseTime = Date.now() + 3*3600*1000;
+  for(let i=0;i<8;i++){
+    const home = shuffled[i*2%teams.length];
+    const away = shuffled[(i*2+1)%teams.length];
+    const kickoff = new Date(baseTime + i*1.8*3600*1000);
+    fixtures.push({
+      id: sport+'-'+i,
+      sport,
+      home, away,
+      venue: venues[i%venues.length],
+      round: 14,
+      kickoff,
+      round_label: sport==='NRL'?'NRL Round 14':'AFL Round 14'
+    });
+  }
+  return fixtures;
+}
+
+const NRL_FIXTURES = makeFixtures(NRL_TEAMS, VENUES_NRL, 'NRL');
+const AFL_FIXTURES = makeFixtures(AFL_TEAMS, VENUES_AFL, 'AFL');
+const ALL_FIXTURES = [...NRL_FIXTURES, ...AFL_FIXTURES];
+
+// Commentary
+const COMMENTARIES = {
+  0:{headline:'Panthers vs Storm: The clash that defines the top four',summary:'Two of the competition\'s most consistent sides meet in a battle that could reshape the top four. Penrith have been iron-tight at home this season while Melbourne continue to produce elite performances on the road.',form:'Penrith arrive on a 5-game winning streak and haven\'t lost at home since Round 3. Melbourne lost their last game but have won 7 of 10 this season.',players:['Nathan Cleary','Cameron Munster','Dylan Edwards','Harry Grant'],tactics:'Watch for Melbourne\'s aerial kicking game to challenge Penrith\'s right-edge defence, particularly the corridor to Grant\'s dummies.',prediction:'Penrith Panthers by 8',confidence:72,watch:['Cleary\'s kicking game under pressure','Storm\'s early-set plays','Penrith\'s kick-in-kick-out from their own 20']},
+  1:{headline:'Broncos target three straight with Roosters clash',summary:'Brisbane come in hot off two strong wins and will fancy their chances against a Roosters side still searching for consistent form.',form:'Brisbane have won their last 3 and look dangerous through the middle. Sydney sit 5-8 and need a win to stay in finals contention.',players:['Payne Haas','Joseph-Aukuso Suaalii','Adam Reynolds','James Tedesco'],tactics:'The Broncos will look to put pressure on the Roosters through their left-edge attack and take advantage of any defensive lapses.',prediction:'Brisbane Broncos by 12',confidence:65,watch:['Payne Haas\'s impact off the bench','Roosters halves pairing under pressure','Brisbane\'s completion rate in set 6']},
+};
+
+// Tips state
+const tips = {};
+let currentFixtureTab = 'nrl';
+let currentTipTab = 'nrl';
+let currentLbTab = 'round';
+
+// Leaderboard data
+const LB_DATA = [
+  {name:'CoachMate99',avatar:'#7c3aed',score:7,total:82,acc:74,mv:2},
+  {name:'TipsterKing',avatar:'#0891b2',score:6,total:79,acc:71,mv:0},
+  {name:'GreenMachine',avatar:'#16a34a',score:6,total:78,acc:70,mv:1},
+  {name:'NRLExpert',avatar:'#dc2626',score:5,total:75,acc:68,mv:-1},
+  {name:'FootyFanatic',avatar:'#d97706',score:5,total:73,acc:66,mv:3},
+  {name:'AFL_Guru',avatar:'#7c3aed',score:5,total:70,acc:64,mv:-2},
+  {name:'StatAttack',avatar:'#0d9488',score:4,total:68,acc:62,mv:0},
+  {name:'TipLab_Pro',avatar:'#be185d',score:4,total:65,acc:59,mv:1},
+  {name:'RoundRobin',avatar:'#1d4ed8',score:3,total:62,acc:57,mv:-3},
+  {name:'NewTipper',avatar:'#374151',score:3,total:58,acc:53,mv:0},
+];
+
+/* ===================================================================
+   INIT
+=================================================================== */
+document.addEventListener('DOMContentLoaded',()=>{
+  renderFeaturedMatches();
+  renderFixtures();
+  renderTipping();
+  renderLeaderboard();
+  renderAdminResults();
+  startCountdowns();
+  initHeroCountdown();
+});
+
+/* ===================================================================
+   NAV
+=================================================================== */
+function showSection(id) {
+  document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function setActive(el) {
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  el.classList.add('active');
+}
+function setMobileActive(el) {
+  document.querySelectorAll('.mnav-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+}
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+/* ===================================================================
+   UTILS
+=================================================================== */
+function fmtKickoff(d){
+  const opts={weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Australia/Sydney'};
+  return d.toLocaleString('en-AU',opts)+' AEST';
+}
+function countdown(d){
+  const diff=d-Date.now();
+  if(diff<=0)return'Kicked Off';
+  const h=Math.floor(diff/3600000);
+  const m=Math.floor((diff%3600000)/60000);
+  const s=Math.floor((diff%60000)/1000);
+  if(h>24){const days=Math.floor(h/24);return`${days}d ${h%24}h`;}
+  if(h>0)return`${h}h ${m}m`;
+  return`${m}m ${s}s`;
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+function teamLogo(team,sz=44){
+  return`<div class="team-logo" style="background:${team.color};color:${team.text};width:${sz}px;height:${sz}px;font-size:${sz*.18}rem">${team.code}</div>`;
+}
+function formStrip(results=['W','W','L','W','L']){
+  return'<div class="form-strip">'+results.map(r=>`<div class="form-dot form-${r.toLowerCase()}">${r}</div>`).join('')+'</div>';
+}
+
+/* ===================================================================
+   MATCH CARD
+=================================================================== */
+function buildMatchCard(fixture,idx,showTipBtn=false){
+  const comm=COMMENTARIES[idx%2];
+  const cid=fixture.id;
+  return`
+<div class="match-card ${fixture.sport.toLowerCase()}-card" id="card-${cid}">
+  <div class="match-card-top">
+    <div class="match-meta">
+      <span class="badge ${fixture.sport==='NRL'?'badge-nrl':'badge-afl'}">${fixture.sport}</span>
+      <span>Round ${fixture.round}</span>
+    </div>
+    <div class="match-meta">${fixture.venue}</div>
+  </div>
+  <div class="match-teams">
+    <div class="team-col">
+      ${teamLogo(fixture.home)}
+      <div class="team-name">${fixture.home.name}</div>
+      ${formStrip(['W','W','L','W','W'])}
+    </div>
+    <div class="vs-block">
+      <div class="vs-text">VS</div>
+      <div class="countdown" id="cd-${cid}" data-kickoff="${fixture.kickoff.getTime()}">${countdown(fixture.kickoff)}</div>
+    </div>
+    <div class="team-col away">
+      ${teamLogo(fixture.away)}
+      <div class="team-name">${fixture.away.name}</div>
+      ${formStrip(['W','L','W','L','W'])}
+    </div>
+  </div>
+  <div class="match-footer">
+    <div class="kickoff-time">⏰ <strong>${fmtKickoff(fixture.kickoff)}</strong></div>
+    ${showTipBtn?`<button class="tip-btn ${tips[cid]?'tipped':''}" id="tipbtn-${cid}" onclick="quickTip('${cid}',this)">${tips[cid]?'✓ '+tips[cid]:'Tip Game'}</button>`:''}
+  </div>
+  <button class="commentary-toggle" onclick="toggleCommentary('${cid}',this)">
+    <span style="display:flex;align-items:center;gap:6px">📋 <span>Match Preview & Analysis</span></span>
+    <span class="toggle-icon" id="ti-${cid}">▾</span>
+  </button>
+  <div class="commentary-panel" id="cp-${cid}">
+    <div class="commentary-inner">
+      <div class="commentary-headline">${comm.headline}</div>
+      <div class="commentary-summary">${comm.summary}</div>
+      <div class="commentary-section">
+        <div class="commentary-section-title">Form Guide</div>
+        <div class="commentary-section-body">${comm.form}</div>
+      </div>
+      <div class="commentary-section">
+        <div class="commentary-section-title">Key Players</div>
+        <div class="key-players">${comm.players.map(p=>`<span class="player-chip">⭐ ${p}</span>`).join('')}</div>
+      </div>
+      <div class="commentary-section">
+        <div class="commentary-section-title">Tactical Analysis</div>
+        <div class="commentary-section-body">${comm.tactics}</div>
+      </div>
+      <div class="commentary-section">
+        <div class="commentary-section-title">Things to Watch</div>
+        <ul class="watch-list">${comm.watch.map(w=>`<li>${w}</li>`).join('')}</ul>
+      </div>
+      <div class="commentary-section">
+        <div class="commentary-section-title">Confidence</div>
+        <div class="confidence-bar-wrap">
+          <div class="confidence-bar"><div class="confidence-bar-fill" style="width:${comm.confidence}%"></div></div>
+          <div class="confidence-label">${comm.confidence}%</div>
+        </div>
+      </div>
+      <div class="prediction-box">
+        <div class="prediction-label">🎯 TipLab Prediction</div>
+        <div class="prediction-text">${comm.prediction}</div>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+function toggleCommentary(id,btn){
+  const panel=document.getElementById('cp-'+id);
+  const icon=document.getElementById('ti-'+id);
+  panel.classList.toggle('open');
+  icon.classList.toggle('open');
+}
+
+function quickTip(id,btn){
+  showToast('Tip saved ✓');
+  btn.classList.add('tipped');
+  btn.textContent='✓ Tipped';
+}
+
+/* ===================================================================
+   RENDER FEATURED
+=================================================================== */
+function renderFeaturedMatches(){
+  const featured=[NRL_FIXTURES[0],AFL_FIXTURES[0]];
+  const el=document.getElementById('featuredMatches');
+  el.innerHTML=featured.map((f,i)=>buildMatchCard(f,i,true)).join('');
+}
+
+/* ===================================================================
+   RENDER FIXTURES
+=================================================================== */
+function renderFixtures(){
+  const nrlEl=document.getElementById('nrl-fixtures');
+  const aflEl=document.getElementById('afl-fixtures');
+  nrlEl.innerHTML=NRL_FIXTURES.map((f,i)=>buildMatchCard(f,i,true)).join('');
+  aflEl.innerHTML=AFL_FIXTURES.map((f,i)=>buildMatchCard(f,i,true)).join('');
+}
+
+function switchFixtureTab(tab,btn){
+  document.querySelectorAll('#fixtureTabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('nrl-fixtures').style.display=tab==='nrl'?'grid':'none';
+  document.getElementById('afl-fixtures').style.display=tab==='afl'?'grid':'none';
+}
+
+/* ===================================================================
+   RENDER TIPPING
+=================================================================== */
+function renderTipping(){
+  renderTipSection('nrl',NRL_FIXTURES);
+  renderTipSection('afl',AFL_FIXTURES);
+  renderProgressDots();
+}
+
+function renderTipSection(sport,fixtures){
+  const el=document.getElementById(`${sport}-tipping`);
+  el.innerHTML=`<div class="tipping-grid">${fixtures.map((f,i)=>buildTipRow(f,i)).join('')}</div>`;
+}
+
+function buildTipRow(f,idx){
+  const id=f.id;
+  const tipped=tips[id];
+  return`
+<div class="tip-row">
+  <div class="tip-row-inner">
+    <button class="tip-team-btn ${tipped===f.home.code?'selected':tipped?'opponent-selected':''}" onclick="selectTip('${id}','${f.home.code}','${f.sport}')">
+      ${teamLogo(f.home,36)}
+      <div class="tip-team-name">${f.home.name}</div>
+    </button>
+    <div class="tip-vs">VS</div>
+    <button class="tip-team-btn ${tipped===f.away.code?'selected':tipped?'opponent-selected':''}" onclick="selectTip('${id}','${f.away.code}','${f.sport}')">
+      ${teamLogo(f.away,36)}
+      <div class="tip-team-name">${f.away.name}</div>
+    </button>
+  </div>
+  <div class="tip-row-meta">
+    <div class="tip-row-info">⏰ ${fmtKickoff(f.kickoff)} · ${f.venue}</div>
+    <div class="tip-saved ${tipped?'show':''}" id="saved-${id}">✓ Saved</div>
+  </div>
+</div>`;
+}
+
+function selectTip(id,code,sport){
+  tips[id]=code;
+  // Re-render just this sport's tipping rows
+  const fixtures=sport==='NRL'?NRL_FIXTURES:AFL_FIXTURES;
+  renderTipSection(sport.toLowerCase(),fixtures);
+  updateTipCount();
+  showToast('Tip saved ✓');
+}
+
+function switchTipTab(tab,btn){
+  document.querySelectorAll('#tipTabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('nrl-tipping').style.display=tab==='nrl'?'block':'none';
+  document.getElementById('afl-tipping').style.display=tab==='afl'?'block':'none';
+}
+
+function updateTipCount(){
+  const count=Object.keys(tips).length;
+  document.getElementById('tipCount').textContent=`${count} / 16 tipped`;
+  document.getElementById('tipProgressNum').textContent=count;
+  renderProgressDots();
+}
+
+function renderProgressDots(){
+  const count=Object.keys(tips).length;
+  const dotsEl=document.getElementById('progressDots');
+  dotsEl.innerHTML=Array.from({length:16},(_,i)=>`<div class="dot ${i<count?'filled':''}"></div>`).join('');
+}
+
+function submitAllTips(){
+  const count=Object.keys(tips).length;
+  if(count===0){showToast('Select at least one tip first!');return;}
+  showToast(`🎉 ${count} tips submitted successfully!`);
+}
+
+/* ===================================================================
+   LEADERBOARD
+=================================================================== */
+function renderLeaderboard(){
+  const el=document.getElementById('lbBody');
+  const rankClasses=['gold','silver','bronze'];
+  el.innerHTML=LB_DATA.map((u,i)=>`
+<div class="lb-row ${i<3?'top-3':''}">
+  <div class="lb-rank ${rankClasses[i]||''}">${i<3?['🥇','🥈','🥉'][i]:i+1}</div>
+  <div class="lb-user">
+    <div class="lb-avatar" style="background:${u.avatar};color:#fff;font-size:.65rem">${u.name.slice(0,2).toUpperCase()}</div>
+    <div>
+      <div class="lb-username">${u.name}</div>
+      <div class="lb-sub">Round ${14-Math.floor(i/3)} completed</div>
+    </div>
+  </div>
+  <div class="lb-score">${u.score}</div>
+  <div class="lb-pts">${u.total}</div>
+  <div class="lb-acc" style="color:${u.acc>70?'var(--green)':u.acc>60?'#fbbf24':'#f87171'}">${u.acc}%</div>
+</div>`).join('');
+}
+
+function switchLbTab(tab,btn){
+  document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  // In production this would re-fetch; we'll just re-render with slight variation
+  LB_DATA.forEach(u=>u.score=Math.floor(Math.random()*4)+3);
+  LB_DATA.sort((a,b)=>b.score-a.score||b.total-a.total);
+  renderLeaderboard();
+}
+
+/* ===================================================================
+   ADMIN RESULTS
+=================================================================== */
+function renderAdminResults(){
+  const el=document.getElementById('adminResults');
+  const results=[...NRL_FIXTURES.slice(0,4),...AFL_FIXTURES.slice(0,4)];
+  el.innerHTML=results.map(f=>`
+<div style="padding:12px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr 100px;gap:8px;align-items:center;font-size:.82rem">
+  <div style="color:var(--text);font-weight:500">${f.home.name} vs ${f.away.name}</div>
+  <select style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:.8rem;width:100%">
+    <option value="">Select winner…</option>
+    <option value="home">${f.home.name}</option>
+    <option value="away">${f.away.name}</option>
+    <option value="draw">Draw</option>
+  </select>
+  <button class="btn btn-primary btn-sm" style="width:100%" onclick="showToast('Result saved ✓')">Save</button>
+</div>`).join('');
+}
+
+/* ===================================================================
+   COUNTDOWNS
+=================================================================== */
+function startCountdowns(){
+  setInterval(()=>{
+    document.querySelectorAll('[data-kickoff]').forEach(el=>{
+      const t=new Date(parseInt(el.dataset.kickoff));
+      el.textContent=countdown(t);
+    });
+  },1000);
+}
+
+function initHeroCountdown(){
+  const nextFixture=ALL_FIXTURES.sort((a,b)=>a.kickoff-b.kickoff)[0];
+  const el=document.getElementById('heroCountdown');
+  setInterval(()=>{
+    el.textContent='⚡ Kickoff in '+countdown(nextFixture.kickoff);
+  },1000);
+}
+</script>
+</body>
+</html>
